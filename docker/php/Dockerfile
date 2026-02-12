@@ -12,11 +12,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     sqlite3 \
     libsqlite3-dev \
-    && rm -rf /var/lib/apt/lists/* \
-
-    && docker-php-ext-install pdo_sqlite pdo_mysql mbstring exif pcntl bcmath gd sockets zip
-
+    && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd zip sockets
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
