@@ -1,29 +1,35 @@
+version: "3.9"
+
 services:
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
-    container_name: laravel_app_solucao
+      dockerfile: docker/app/Dockerfile
+    container_name: zh_container_laravel
     working_dir: /var/www
     volumes:
-      - ./:/var/www:delegated
-    ports:
-      - "8000:8000"
-    command: php artisan serve --host=0.0.0.0 --port=8000
-
-  node:
-    build:
-      context: .
-      dockerfile: docker/node/Dockerfile
-    container_name: vite_dev_solucao
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - node_modules_cache:/var/www/node_modules
+      - .:/var/www
+      - node_modules:/var/www/node_modules
     ports:
       - "5173:5173"
-    command: ["npm", "run", "dev", "--", "--host"]
+    networks:
+      - laravel
 
+  nginx:
+    image: nginx:stable-alpine
+    container_name: zh_container_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - laravel
 
-volumes: 
-  node_modules_cache:
+networks:
+  laravel:
+
+volumes:
+  node_modules:
